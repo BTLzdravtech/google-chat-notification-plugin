@@ -5,8 +5,8 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.cnaik.GoogleChatNotification;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.util.URIUtil;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
@@ -166,7 +166,7 @@ public class CommonUtil {
 
                 if (googleChatNotification.isSameThreadNotification()) {
                     String jobName = TokenMacro.expandAll(build, ws, taskListener, "${JOB_NAME}", false, null);
-                    urlDetail = urlDetail + "&threadKey=" + URIUtil.encodePath(jobName);
+                    urlDetail = urlDetail + "&threadKey=" + URLEncoder.encode(jobName, StandardCharsets.UTF_8);
                 }
 
                 var client = HttpClient.newHttpClient();
@@ -179,7 +179,7 @@ public class CommonUtil {
 
                 var response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                if (response.statusCode() != HttpStatus.SC_OK) {
+                if (response.statusCode() != 200) {
                     var body = response.body();
 
                     if (logUtil.printLogEnabled()) {
